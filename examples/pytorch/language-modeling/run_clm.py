@@ -539,6 +539,11 @@ def main():
         else None,
     )
 
+
+    print("training_args.fp16 = ", training_args.fp16)
+    print("training_args.half_precision_backend = ", training_args.half_precision_backend)
+    print("training_args.fp16_opt_level = ", training_args.fp16_opt_level)
+
     # Training
     if training_args.do_train:
         checkpoint = None
