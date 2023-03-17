@@ -601,6 +601,7 @@ class Trainer:
                         " https://www.github.com/nvidia/apex."
                     )
                 self.use_apex = True
+                print("GRAD SCALING: ", self.do_grad_scaling)
 
         # FP16 + model parallelism in SageMaker: gradient clipping does not work for now so we raise a helpful error.
         if (
