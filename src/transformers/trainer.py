@@ -33,6 +33,8 @@ from distutils.util import strtobool
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union
 
+from rpdTracerControl import rpdTracerControl
+
 from tqdm.auto import tqdm
 
 
@@ -316,6 +318,12 @@ class Trainer:
         self.hp_name = None
         self.deepspeed = None
         self.is_in_train = False
+
+
+        # init rpdTracer
+        self.profiler = rpdTracerControl()
+        self.emit_nvtx = torch.autograd.profiler.emit_nvtx(record_shapes=True)
+
 
         # memory metrics - must set up as early as possible
         self._memory_tracker = TrainerMemoryTracker(self.args.skip_memory_metrics)
@@ -1771,6 +1779,22 @@ class Trainer:
                 if (self.state.global_step == 10):
                     start_train_stable_time = time.time()
 
+
+
+                # start profiling after 20 steps for 5 steps
+                if (self.state.global_step == 20):
+                    print("STARTING RPDTRACER")
+                    self.profiler.start()
+                    self.emit_nvtx.__enter__()
+                if (self.state.global_step == 25):
+                    print("STOPPING RPDTRACER")
+                    self.profiler.stop()
+                    self.emit_nvtx.__exit__(None, None, None)
+                    break
+
+
+
+
                 # Skip past any already trained steps if resuming training
                 if steps_trained_in_current_epoch > 0:
                     steps_trained_in_current_epoch -= 1
@@ -1899,6 +1923,7 @@ class Trainer:
                         "configured. Check your training configuration if this is unexpected."
                     )
             if self.control.should_training_stop:
+                # ANDY: stop profiler here
                 break
 
         if args.past_index and hasattr(self, "_past"):
