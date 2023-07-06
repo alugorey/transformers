@@ -1782,11 +1782,11 @@ class Trainer:
 
 
                 # start profiling after 20 steps for 5 steps
-                if (self.state.global_step == 20):
+                if (self.state.global_step == 205):
                     print("STARTING RPDTRACER")
                     self.profiler.start()
                     self.emit_nvtx.__enter__()
-                if (self.state.global_step == 25):
+                if (self.state.global_step == 215):
                     print("STOPPING RPDTRACER")
                     self.profiler.stop()
                     self.emit_nvtx.__exit__(None, None, None)
